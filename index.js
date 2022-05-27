@@ -14,7 +14,24 @@ const client = new MongoClient(uri, {
     useUnifiedTopology: true,
     serverApi: ServerApiVersion.v1,
 });
-console.log("mongo mongo");
+
+async function run() {
+    try {
+        await client.connect();
+        const todoCollection = client.db("toDoNotes").collection("notes");
+        app.post("/note", async (req, res) => {
+            const note = req.body;
+            const result = await todoCollection.insertOne(note);
+            res.send(result);
+        });
+        app.get("/note", async (req, res) => {
+            const notes = await todoCollection.find().toArray();
+            res.send(notes);
+        });
+    } finally {
+    }
+}
+run().catch(console.dir);
 
 app.get("/", (req, res) => {
     res.send("To Do World!");
